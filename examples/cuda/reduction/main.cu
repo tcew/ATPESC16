@@ -37,13 +37,11 @@ __global__ void partialSum(const int N,
     __syncthreads();  // barrier (make sure s_red is ready)
     
     alive /= 2;
-    if(t < alive)
-      s_blocksum[t] += s_blocksum[t+alive];
+    if(t < alive) s_blocksum[t] += s_blocksum[t+alive];
   }
   
   // value in s_blocksum[0] is sum of block of values
-  if(t==0) 
-    blocksum[b] = s_blocksum[0];
+  if(t==0) blocksum[b] = s_blocksum[0];
 }
   
 
@@ -267,7 +265,7 @@ void sum(int N, datafloat *h_u){
   datafloat *h_partialsum;
 
   // number of thread-blocks to partial sum u
-  int GDIM = 256; // (N+BDIM-1)/BDIM;
+  int GDIM = 1024;
 
   // allocate host array
   h_partialsum = (datafloat*) calloc(GDIM, sizeof(datafloat));
@@ -292,11 +290,14 @@ void sum(int N, datafloat *h_u){
 
   for(test=0;test<Ntests;++test){
     // perform tree wise block reduction on DEVICE
-    //    unrolledPartialSum <<< GDIM, BDIM >>> (N, c_u, c_partialsum);
+    //unrolledPartialSum <<< dim3(GDIM), dim3(BDIM) >>> (N, c_u, c_partialsum);
 
+    // use harris optimized reduction
+    harrisUnrolledPartialSum <<< dim3(GDIM), dim3(BDIM) >>> (N, c_u, c_partialsum);
+    
     // use single barrier kernel
-    singleBarrierPartialSum <<< dim3(256,1,1), dim3(SIMT,SIMT,1) >>> (N, c_u, c_partialsum);
-
+    //    singleBarrierPartialSum <<< dim3(256,1,1), dim3(SIMT,SIMT,1) >>> (N, c_u, c_partialsum);
+   
     // copy array of partially summed values to HOST
     cudaMemcpy(h_partialsum, c_partialsum, GDIM*sizeof(datafloat), cudaMemcpyDeviceToHost);
 
