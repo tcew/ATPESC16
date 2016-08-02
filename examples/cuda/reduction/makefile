@@ -1,4 +1,4 @@
-cudaFlags = -arch=sm_52 -m64 -O3 --use_fast_math
+cudaFlags =  -m64 -O3 --use_fast_math
 
 # To use clang in OSX
 ifeq ($(shell uname -s),Darwin)
