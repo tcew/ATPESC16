@@ -181,26 +181,37 @@ __global__ void harrisUnrolledPartialSum(const int N,
 
   if(BDIM>32){
     if(t<32) s_blocksum[t] += s_blocksum[t+32];
+
+    // should use sync(this_warp()); to safely guarantee warp synchronization
   }
 
   if(BDIM>16){
     if(t<16) s_blocksum[t] += s_blocksum[t+16];
+
+    // should use sync(this_warp()); to safely guarantee warp synchronization
   }
 
   if(BDIM>8){
     if(t<8)  s_blocksum[t] += s_blocksum[t+8];
+
+    // should use sync(this_warp()); to safely guarantee warp synchronization
   }
 
   if(BDIM>4){
     if(t<4) s_blocksum[t] += s_blocksum[t+4];
+
+    // should use sync(this_warp()); to safely guarantee warp synchronization
   }
 
   if(BDIM>2){
     if(t<2) s_blocksum[t] += s_blocksum[t+2];
+
+    // should use sync(this_warp()); to safely guarantee warp synchronization
   }
 
   if(BDIM>1){
     if(t<1) s_blocksum[t] += s_blocksum[t+1];
+
   }
   
   // store result of this block blocksumuction
@@ -232,13 +243,14 @@ __global__ void singleBarrierPartialSum(const int N, const datafloat* __restrict
     bs += u[id];
     id += M;
   }
-  s_u[g][s] = bs;
+  s_u[g][s] = bs;  // sync(this_warp()); 
+
 
   // 32 separate tree reductions
-  if(s<16) s_u[g][s] += s_u[g][s + 16];
-  if(s< 8) s_u[g][s] += s_u[g][s +  8];
-  if(s< 4) s_u[g][s] += s_u[g][s +  4];
-  if(s< 2) s_u[g][s] += s_u[g][s +  2];
+  if(s<16) s_u[g][s] += s_u[g][s + 16]; // sync(this_warp()); 
+  if(s< 8) s_u[g][s] += s_u[g][s +  8]; // sync(this_warp()); 
+  if(s< 4) s_u[g][s] += s_u[g][s +  4]; // sync(this_warp()); 
+  if(s< 2) s_u[g][s] += s_u[g][s +  2]; // sync(this_warp()); 
   if(s==0) s_partialsum[g] = s_u[g][0] + s_u[g][1];
 
   // make sure all thread blocks got to here
@@ -246,10 +258,10 @@ __global__ void singleBarrierPartialSum(const int N, const datafloat* __restrict
   
   // one thread block finishes partial reduction
   if(g==0){
-    if(s<16) s_partialsum[s] += s_partialsum[s + 16];
-    if(s< 8) s_partialsum[s] += s_partialsum[s +  8];
-    if(s< 4) s_partialsum[s] += s_partialsum[s +  4];
-    if(s< 2) s_partialsum[s] += s_partialsum[s +  2];
+    if(s<16) s_partialsum[s] += s_partialsum[s + 16]; // sync(this_warp()); 
+    if(s< 8) s_partialsum[s] += s_partialsum[s +  8]; // sync(this_warp()); 
+    if(s< 4) s_partialsum[s] += s_partialsum[s +  4]; // sync(this_warp()); 
+    if(s< 2) s_partialsum[s] += s_partialsum[s +  2]; // sync(this_warp()); 
     if(s==0) partialsum[b] = s_partialsum[0] + s_partialsum[1];
   }
 }
