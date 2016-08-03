@@ -42,7 +42,7 @@ void init(int Nrows, int Ncolumns, int **board, int **newboard, int **c_board, i
     }
   }
 
-  /* EX01: allocate DEVICE arrays for c_board and c_newboard here using cudaMalloc */
+  /* EX01: allocate 1D DEVICE arrays with Nrows*Ncolumns ints for c_board and c_newboard here using cudaMalloc */
 
   /* EX02a: copy board state from HOST board to DEVICE c_board using cudaMemcpy */
 
