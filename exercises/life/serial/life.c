@@ -51,9 +51,10 @@ void destroy(int *board, int *newboard){
 }
 
 void update(int Nrows, int Ncolumns, int *board, int *newboard){
-
-  for(int r=1;r<Nrows-1;++r){
-    for(int c=1;c<Ncolumns-1;++c){
+  int r,c;
+  
+  for(r=1;r<Nrows-1;++r){
+    for(c=1;c<Ncolumns-1;++c){
       int s = 
 	board[id(r-1,c-1)]+board[id(r-1,c-0)]+board[id(r-1,c+1)]+
 	board[id(r+0,c-1)]+                   board[id(r+0,c+1)]+
@@ -66,9 +67,11 @@ void update(int Nrows, int Ncolumns, int *board, int *newboard){
 }
 
 void print(int Nrows, int Ncolumns, int *board){
+  int r,c;
+
   system("clear");
-  for(int r=0;r<Nrows;++r){
-    for(int c=0;c<Ncolumns;++c){
+  for(r=0;r<Nrows;++r){
+    for(c=0;c<Ncolumns;++c){
       if(board[id(r,c)]==BORN) printf("*");
       else printf(" ");
     }
@@ -92,8 +95,8 @@ int main(int argc, char **argv){
   init(Nrows, Ncolumns, &board, &newboard);
 
   /* run some iterations */
-  int Nit = 400;
-  for(int it=0;it<Nit;++it){
+  int Nit = 400, it;
+  for(it=0;it<Nit;++it){
     update(Nrows, Ncolumns, board, newboard);
     update(Nrows, Ncolumns, newboard, board);
 
